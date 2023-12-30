@@ -11,16 +11,18 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/robfig/cron/v3"
 )
 
 func main() {
+	godotenv.Load(".env")
 	dbConfig := config.DatabaseConfig{
-		User:     "root",
-		Password: "root",
-		Host:     "localhost",
-		Port:     "3306",
-		DBName:   "cron-ispu",
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		DBName:   os.Getenv("DB_NAME"),
 	}
 	db, err := config.SetupDB(dbConfig)
 	if err != nil {
@@ -30,7 +32,7 @@ func main() {
 
 	r := routes.SetupRoutes(db)
 	go func() {
-		err := r.Run(":2000")
+		err := r.Run(":8080")
 		if err != nil {
 			fmt.Println("Error running routes:", err)
 		}
